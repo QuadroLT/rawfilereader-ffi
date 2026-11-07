@@ -1,0 +1,10 @@
+<Directives xmlns="http://schemas.microsoft.com/netfx/2013/01/metadata">
+  <Application>
+    <Assembly Name="ThermoFisher.CommonCore.Data" Dynamic="Required All" />
+    <Assembly Name="ThermoFisher.CommonCore.RawFileReader" Dynamic="Required All" />
+    <Assembly Name="ThermoFisher.CommonCore.BackgroundSubtraction" Dynamic="Required All" />
+    <Assembly Name="ThermoFisher.CommonCore.MassPrecisionEstimator" Dynamic="Required All" />
+    <Assembly Name="OpenMcdf" Dynamic="Required All" />
+    <Assembly Name="OpenMcdf.Extensions" Dynamic="Required All" />
+  </Application>
+</Directives>

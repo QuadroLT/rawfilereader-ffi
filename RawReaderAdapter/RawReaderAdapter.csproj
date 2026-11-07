@@ -1,0 +1,63 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <IlcGenerateTypeInfo>true</IlcGenerateTypeInfo>
+    <IlcDisableReflectionVisibilityAnalysis>false</IlcDisableReflectionVisibilityAnalysis>
+    <TrimmingPreference>full</TrimmingPreference>
+    <PublishAot>true</PublishAot>
+    <NativeLib>Shared</NativeLib>
+    <Nullable>enable</Nullable>
+    <AssemblyName>librawfilereader</AssemblyName>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <SelfContained>true</SelfContained>
+    <ConcurrentGarbageCollection>false</ConcurrentGarbageCollection>
+    <ServerGarbageCollection>false</ServerGarbageCollection>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="ThermoFisher.CommonCore.Data">
+      <HintPath>Libs/ThermoFisher.CommonCore.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="ThermoFisher.CommonCore.RawFileReader">
+      <HintPath>Libs/ThermoFisher.CommonCore.RawFileReader.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenMcdf.Extensions">
+      <HintPath>Libs/OpenMcdf.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenMcdf">
+      <HintPath>Libs/OpenMcdf.dll</HintPath>
+    </Reference>
+    <Reference Include="ThermoFisher.CommonCore.MassPrecisionEstimator">
+      <HintPath>Libs/ThermoFisher.CommonCore.MassPrecisionEstimator.dll</HintPath>
+    </Reference>
+    <Reference Include="ThermoFisher.CommonCore.BackgroundSubtraction">
+      <HintPath>Libs/ThermoFisher.CommonCore.BackgroundSubtraction.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <TrimmerRootAssembly Include="ThermoFisher.CommonCore.Data" />
+    <TrimmerRootAssembly Include="ThermoFisher.CommonCore.RawFileReader" />
+    <TrimmerRootAssembly Include="ThermoFisher.CommonCore.BackgroundSubtraction" />
+    <TrimmerRootAssembly Include="ThermoFisher.CommonCore.MassPrecisionEstimator" />
+    <TrimmerRootAssembly Include="OpenMcdf" />
+    <TrimmerRootAssembly Include="OpenMcdf.Extensions" />
+    <RdXmlFile Include="rd.xml" />
+  </ItemGroup>
+
+  <!-- Fix macOS dylib install name to support @rpath so consumers can load it from any location -->
+  <Target Name="FixDylibInstallName" AfterTargets="Publish;LinkNative" BeforeTargets="CopyToLibDir" Condition="$([MSBuild]::IsOSPlatform('OSX'))">
+    <Exec Command="install_name_tool -id @rpath/$(TargetName).dylib &quot;$(MSBuildProjectDirectory)/$(PublishDir)$(TargetName).dylib&quot; 2&gt;/dev/null || true" ContinueOnError="true" />
+    <Exec Command="install_name_tool -id @rpath/$(TargetName).dylib &quot;$(NativeBinary)&quot; 2&gt;/dev/null || true" ContinueOnError="true" />
+  </Target>
+
+  <Target Name="CopyToLibDir" AfterTargets="Publish">
+    <MakeDir Directories="$(MSBuildProjectDirectory)/../lib" />
+    <Copy SourceFiles="$(MSBuildProjectDirectory)/$(PublishDir)$(TargetName).dylib" DestinationFolder="$(MSBuildProjectDirectory)/../lib" Condition="Exists('$(MSBuildProjectDirectory)/$(PublishDir)$(TargetName).dylib')" />
+    <Copy SourceFiles="$(MSBuildProjectDirectory)/$(PublishDir)$(TargetName).so" DestinationFolder="$(MSBuildProjectDirectory)/../lib" Condition="Exists('$(MSBuildProjectDirectory)/$(PublishDir)$(TargetName).so')" />
+    <Copy SourceFiles="$(MSBuildProjectDirectory)/$(PublishDir)$(TargetName).dll" DestinationFolder="$(MSBuildProjectDirectory)/../lib" Condition="Exists('$(MSBuildProjectDirectory)/$(PublishDir)$(TargetName).dll')" />
+  </Target>
+
+</Project>
